@@ -231,14 +231,19 @@ position: relative;
 	}
 
 function convertDate(d) {
-	d = new Date(d);
-  return [d.getDate(), d.getMonth()+1, d.getFullYear()]
+	if(d == null || d == '' || d == 'undefined'){
+		d = new Date()
+	}else{
+		d = new Date(d);
+	}
+	return [d.getDate(), d.getMonth()+1, d.getFullYear()]
       .map(n => n < 10 ? `0${n}` : `${n}`).join('/');
 }
 	
 function invokeNLP(txt){
 	// Sending and receiving data in JSON format using POST method
 	//
+	document.getElementById("micloader").style.display = "inline";
 	var xhr = new XMLHttpRequest();
 	var url = "https://78b94ab8.ngrok.io/common_api/";
 	//var url = "https://reqres.in/api/products/3";
@@ -249,11 +254,14 @@ function invokeNLP(txt){
 			console.log(xhr.responseText);
 			var json = JSON.parse(xhr.responseText);
 			console.log(json.Entity_recognition.Source_Airport);
-			
+			document.getElementById("micloader").style.display = "none";
+			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").focus();
 			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").value = json.Entity_recognition.Source_Airport;
 			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].destinationCode").value = json.Entity_recognition.Destination_Airport;
-			//document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").focus();
-			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").checked = true;
+			//document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").checked = true;
+			if(!document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").checked){
+				document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").click();
+			}
 			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].travelDatetime").focus();
 			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].travelDatetime").value = convertDate(json.Entity_recognition.Onward_Date);
 			
@@ -267,7 +275,7 @@ function invokeNLP(txt){
     formData.append('text_body', txt);
   
 	xhr.send(formData);
-	document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").focus();
+	//document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").focus();
 
 	
 }
