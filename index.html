@@ -226,10 +226,16 @@ position: relative;
 		  if (recognizing) {
 			recognition.stop();
 		  }
-		invokeNLP("Please book flight from sydney to melbourne on 29-03-2019");
+		invokeNLP(final_transcript);
 	  };
 	}
 
+function convertDate(d) {
+	d = new Date(d);
+  return [d.getDate(), d.getMonth()+1, d.getFullYear()]
+      .map(n => n < 10 ? `0${n}` : `${n}`).join('/');
+}
+	
 function invokeNLP(txt){
 	// Sending and receiving data in JSON format using POST method
 	//
@@ -237,21 +243,38 @@ function invokeNLP(txt){
 	var url = "https://78b94ab8.ngrok.io/common_api/";
 	//var url = "https://reqres.in/api/products/3";
 	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Content-Type", "application/json");
+	//xhr.setRequestHeader("Content-Type", "text/plain");
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === 4 && xhr.status === 200) {
+			console.log(xhr.responseText);
 			var json = JSON.parse(xhr.responseText);
-			console.log(json);
+			console.log(json.Entity_recognition.Source_Airport);
+			
+			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").value = json.Entity_recognition.Source_Airport;
+			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].destinationCode").value = json.Entity_recognition.Destination_Airport;
+			//document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").focus();
+			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").checked = true;
+			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].travelDatetime").focus();
+			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].travelDatetime").value = convertDate(json.Entity_recognition.Onward_Date);
+			
+			
 		}
 	};
-	var data = JSON.stringify({"key":"text_body","value":"Please book flight from sydney to melbourne on 29-03-2019","description":""});
-	xhr.send(data);
-	//xhr.send();	
+	//var data = JSON.stringify({"key":"text_body","value":"Please book flight from sydney to melbourne on 29-03-2019","description":""});
+	//xhr.send(data);
+	//xhr.send();
+	var formData = new FormData();
+    formData.append('text_body', txt);
+  
+	xhr.send(formData);
+	document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").focus();
+
+	
 }
 
 function processSpeech(obj){
 
-  /*if (recognizing) {
+  if (recognizing) {
     recognition.stop();
     return;
   }
@@ -261,9 +284,9 @@ function processSpeech(obj){
   recognition.start();
   ignore_onend = false;
   document.getElementById("mic").src = 'images/mic-slash.gif';
-  start_timestamp = event.timeStamp;*/
+  start_timestamp = event.timeStamp;
   
-  invokeNLP("Please book flight from sydney to melbourne on 29-03-2019");
+  //invokeNLP("Please book flight from sydney to melbourne on 29-03-2019");
 }
 
 </script>
