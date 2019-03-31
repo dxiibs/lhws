@@ -148,7 +148,18 @@ margin-bottom: 10px!important;
 top: -10px;
 position: relative;
 }
+
+.loaderGifStyle{
+	/*width : 397px !important;
+	height : 150px !important;*/
+}
+
 </style><script type="text/javascript" async="" charset="utf-8" id="utag_lufthansa.main_204" src="js/utag.204.js?utv=ut4.46.201902190720"></script><script charset="utf-8" src="js/3.6f95ea331080f16cd92c.chunk.js"></script><script charset="utf-8" src="js/6.d1587c533e06576176c5.chunk.js"></script><style data-styled-components=""></style><script charset="utf-8" src="js/76.e3efed4f2103373356f8.chunk.js"></script><script charset="utf-8" src="js/18.f70e6b016047c4a5ae7b.chunk.js"></script><script charset="utf-8" src="js/17.7a9d8f8737bf482a7968.chunk.js"></script><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/local_images/homepage/lufthansa-l.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/local_images/homepage/lufthansa-l.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/local_images/homepage/lufthansa-l.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/local_images/homepage/lufthansa-l.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/local_images/homepage/lufthansa-l.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/local_images/homepage/lufthansa-l.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/local_images/homepage/lufthansa-l.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/offers/destination/aus-square.jpg.transform/lh-dcep-transform-width-180/img.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/offers/destination/mex-square.jpg.transform/lh-dcep-transform-width-180/img.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/offers/destination/nyc-square.jpg.transform/lh-dcep-transform-width-180/img.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/offers/destination/bcn-square.jpg.transform/lh-dcep-transform-width-180/img.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/offers/destination/mia-square.jpg.transform/lh-dcep-transform-width-180/img.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/offers/destination/muc-square.jpg.transform/lh-dcep-transform-width-180/img.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/offers/destination/lon-square.jpg.transform/lh-dcep-transform-width-180/img.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/offers/destination/lax-square.jpg.transform/lh-dcep-transform-width-180/img.jpg"><link rel="prefetch" href="https://www.lufthansa.com/content/dam/lh/images/offers/destination/dxb-square.jpg.transform/lh-dcep-transform-width-180/img.jpg">
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.6/dist/loadingoverlay.min.js"></script>
+
 
 <script type="text/javascript">
 
@@ -169,17 +180,33 @@ position: relative;
 	  recognition.onstart = function() {
 		recognizing = true;
 		console.log('info_speak_now');
-		document.getElementById("mic").src = 'images/mic-animate.gif';
+		document.getElementById("mic").src = 'images/mic.gif';
+		$.LoadingOverlay("show", {
+			 image       : "images/listening.gif",
+			 imageAnimation          : false,
+			 text       : "Listening...",
+			 textOrder : 1,
+			 imageOrder              : 2,
+			 imageClass              : "loaderGifStyle",
+			 imageResizeFactor : 2,
+			 imageAutoResize         : false,
+			 minSize : 0,
+			 fade    : [400, 200],		 
+			 textColor               : "#FFFFFF",
+			 background  : "rgba(0, 0, 0, 0.9)"
+		});
 	  };
 
 	  recognition.onerror = function(event) {
 		if (event.error == 'no-speech') {
 		  document.getElementById("mic").src = 'images/mic.gif';
+		   $.LoadingOverlay("hide");
 		  console.log('info_no_speech');
 		  ignore_onend = true;
 		}
 		if (event.error == 'audio-capture') {
 		  document.getElementById("mic").src = 'images/mic.gif';
+		   $.LoadingOverlay("hide");
 		  console.log('info_no_microphone');
 		  ignore_onend = true;
 		}
@@ -199,7 +226,11 @@ position: relative;
 		  return;
 		}
 		document.getElementById("mic").src = 'images/mic.gif';
-		if (!final_transcript) {
+		//$.LoadingOverlay("hide");
+			$.LoadingOverlay("text", "Processing...");
+			$('.loaderGifStyle').css('cssText','order: 2; box-sizing: border-box; overflow: visible; flex: 0 0 auto; display: flex; justify-content: center; align-items: center; background-image: url("images/processing.gif"); background-position: center center; background-repeat: no-repeat; background-size: cover; width: 180px!important; height: 180px!important;');
+		
+		 if (!final_transcript) {
 		  console.log('info_start');
 		  return;
 		}
@@ -239,13 +270,43 @@ function convertDate(d) {
 	return [d.getDate(), d.getMonth()+1, d.getFullYear()]
       .map(n => n < 10 ? `0${n}` : `${n}`).join('/');
 }
+
+function tidyData(d){
+	data = '';
+	if(d != null && d != '' && d != 'undefined'){
+		data = d;
+	}
+	return data;
+}
+
+function callNLP(obj){
+	if(event.keyCode == 13){
+
+		$.LoadingOverlay("show", {
+			 image       : "images/processing.gif",
+			 imageAnimation          : false,
+			 text       : "Processing...",
+			 textOrder : 1,
+			 imageOrder              : 2,
+			 imageClass              : "loaderGifStyle",
+			 imageResizeFactor : 2,
+			 imageAutoResize         : false,
+			 minSize : 0,
+			 fade    : [400, 200],		 
+			 textColor               : "#FFFFFF",
+			 background  : "rgba(0, 0, 0, 0.9)"
+		});
+		
+		invokeNLP(obj.value);
+	}
+}
 	
 function invokeNLP(txt){
 	// Sending and receiving data in JSON format using POST method
 	//
-	document.getElementById("micloader").style.display = "inline";
+	document.getElementById("freetext").value = txt;
 	var xhr = new XMLHttpRequest();
-	var url = "https://78b94ab8.ngrok.io/common_api/";
+	var url = "http://690b84c5.ngrok.io/common_api/";
 	//var url = "https://reqres.in/api/products/3";
 	xhr.open("POST", url, true);
 	//xhr.setRequestHeader("Content-Type", "text/plain");
@@ -254,17 +315,20 @@ function invokeNLP(txt){
 			console.log(xhr.responseText);
 			var json = JSON.parse(xhr.responseText);
 			console.log(json.Entity_recognition.Source_Airport);
-			document.getElementById("micloader").style.display = "none";
+			//document.getElementById("micloader").style.display = "none";
 			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").focus();
-			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").value = json.Entity_recognition.Source_Airport;
-			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].destinationCode").value = json.Entity_recognition.Destination_Airport;
+			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").value = tidyData(json.Entity_recognition.Source_Airport);
+			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].destinationCode").value = tidyData(json.Entity_recognition.Destination_Airport);
+			//alert(document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").value);
 			//document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").checked = true;
-			if(!document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").checked){
+			if(document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay") && document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").value != 'true'){
 				document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").click();
 			}
 			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].travelDatetime").focus();
 			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].travelDatetime").value = convertDate(json.Entity_recognition.Onward_Date);
 			
+			getAirportCodes(tidyData(json.Entity_recognition.Source_Airport), tidyData(json.Entity_recognition.Destination_Airport));
+			$.LoadingOverlay("hide");
 			
 		}
 	};
@@ -278,6 +342,25 @@ function invokeNLP(txt){
 	//document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").focus();
 
 	
+}
+
+function getAirportCodes(orig,dest){
+	console.log(orig + " : " + dest);
+	var xhr = new XMLHttpRequest();
+	var url = "http://690b84c5.ngrok.io/city_to_code/";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		if (xhr.readyState === 4 && xhr.status === 200) {
+			console.log(xhr.responseText);
+			var json = JSON.parse(xhr.responseText);
+			document.getElementById("hidOrigin").value = json.source_airport_code;
+			document.getElementById("hidDestination").value = json.destination_airport_code;
+		}
+	};
+	var formData = new FormData();
+    formData.append('source_airport', orig);
+	formData.append('dest_airport', dest);
+	xhr.send(formData);
 }
 
 function processSpeech(obj){
