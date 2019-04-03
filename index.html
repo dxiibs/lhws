@@ -149,6 +149,10 @@ top: -10px;
 position: relative;
 }
 
+#spokenText:first-letter{
+text-transform: uppercase;
+}
+
 .loaderGifStyle{
 	/*width : 397px !important;
 	height : 150px !important;*/
@@ -158,7 +162,7 @@ position: relative;
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.6/dist/loadingoverlay.min.js"></script>
+<script src="js/loadingoverlay.js"></script>
 
 
 <script type="text/javascript">
@@ -184,7 +188,7 @@ position: relative;
 		$.LoadingOverlay("show", {
 			 image       : "images/listening.gif",
 			 imageAnimation          : false,
-			 text       : "Listening...",
+			 text       : "<div style='text-align:center;'><div>Listening...</div><div style='margin-top:60px;font-size:20px;'>I can understand Origin, Destination and Travel date!!</div></div>",
 			 textOrder : 1,
 			 imageOrder              : 2,
 			 imageClass              : "loaderGifStyle",
@@ -227,8 +231,6 @@ position: relative;
 		}
 		document.getElementById("mic").src = 'images/mic.gif';
 		//$.LoadingOverlay("hide");
-			$.LoadingOverlay("text", "Processing...");
-			$('.loaderGifStyle').css('cssText','order: 2; box-sizing: border-box; overflow: visible; flex: 0 0 auto; display: flex; justify-content: center; align-items: center; background-image: url("images/processing.gif"); background-position: center center; background-repeat: no-repeat; background-size: cover; width: 180px!important; height: 180px!important;');
 		
 		 if (!final_transcript) {
 		  console.log('info_start');
@@ -257,17 +259,21 @@ position: relative;
 		  if (recognizing) {
 			recognition.stop();
 		  }
+		$.LoadingOverlay("text", "<div style='text-align:center;'><div>Processing...</div><div id='spokenText' style='margin-top:60px;font-size:20px;'>"+final_transcript+"</div></div>");
+		$('.loaderGifStyle').css('cssText','order: 2; box-sizing: border-box; overflow: visible; flex: 0 0 auto; display: flex; justify-content: center; align-items: center; background-image: url("images/processing.gif"); background-position: center center; background-repeat: no-repeat; background-size: cover; width: 180px!important; height: 180px!important;');
+
 		invokeNLP(final_transcript);
 	  };
 	}
 
 function convertDate(d) {
+	//console.log(d);
 	if(d == null || d == '' || d == 'undefined'){
 		d = new Date()
 	}else{
 		d = new Date(d);
 	}
-	return [d.getDate(), d.getMonth()+1, d.getFullYear()]
+	return [d.getMonth()+1, d.getDate(), d.getFullYear()]
       .map(n => n < 10 ? `0${n}` : `${n}`).join('/');
 }
 
@@ -306,28 +312,30 @@ function invokeNLP(txt){
 	//
 	document.getElementById("freetext").value = txt;
 	var xhr = new XMLHttpRequest();
-	var url = "http://690b84c5.ngrok.io/common_api/";
-	//var url = "https://reqres.in/api/products/3";
+	//var url = "http://3.122.246.102:8001/entity_recognition/";
+	var url = "https://nlp.digitalibs.com/entity_recognition/";
 	xhr.open("POST", url, true);
+	document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").focus();
 	//xhr.setRequestHeader("Content-Type", "text/plain");
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === 4 && xhr.status === 200) {
 			console.log(xhr.responseText);
 			var json = JSON.parse(xhr.responseText);
-			console.log(json.Entity_recognition.Source_Airport);
+			console.log(json.Source_Airport);
 			//document.getElementById("micloader").style.display = "none";
 			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").focus();
-			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").value = tidyData(json.Entity_recognition.Source_Airport);
-			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].destinationCode").value = tidyData(json.Entity_recognition.Destination_Airport);
+			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").value = tidyData(json.Source_Airport);
+			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].destinationCode").value = tidyData(json.Destination_Airport);
 			//alert(document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").value);
 			//document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").checked = true;
 			if(document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay") && document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").value != 'true'){
 				document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-isOneWay").click();
 			}
 			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].travelDatetime").focus();
-			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].travelDatetime").value = convertDate(json.Entity_recognition.Onward_Date);
+			console.log(convertDate(json.Onward_Date != null ? json.Onward_Date : json.Return_Date))
+			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].travelDatetime").value = convertDate(json.Onward_Date != null ? json.Onward_Date : json.Return_Date);
 			
-			getAirportCodes(tidyData(json.Entity_recognition.Source_Airport), tidyData(json.Entity_recognition.Destination_Airport));
+			getAirportCodes(tidyData(json.Source_Airport), tidyData(json.Destination_Airport));
 			$.LoadingOverlay("hide");
 			
 		}
@@ -337,17 +345,20 @@ function invokeNLP(txt){
 	//xhr.send();
 	var formData = new FormData();
     formData.append('text_body', txt);
-  
 	xhr.send(formData);
 	//document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").focus();
 
+	setTimeout(function(){
+		$.LoadingOverlay("hide");
+	}, 10000);
 	
 }
 
 function getAirportCodes(orig,dest){
 	console.log(orig + " : " + dest);
 	var xhr = new XMLHttpRequest();
-	var url = "http://690b84c5.ngrok.io/city_to_code/";
+	var url = "https://nlp.digitalibs.com/city_to_code/";
+	//var url = "http://3.122.246.102:8001/city_to_code/";
 	xhr.open("POST", url, true);
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === 4 && xhr.status === 200) {
@@ -355,6 +366,9 @@ function getAirportCodes(orig,dest){
 			var json = JSON.parse(xhr.responseText);
 			document.getElementById("hidOrigin").value = json.source_airport_code;
 			document.getElementById("hidDestination").value = json.destination_airport_code;
+			if(document.getElementById("hidOrigin").value != null && document.getElementById("hidDestination").value != null && document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].travelDatetime").value != null){
+				invokeGoogleFlights();
+			}
 		}
 	};
 	var formData = new FormData();
