@@ -435,8 +435,7 @@ LoadingOverlay - A flexible loading overlay jQuery plugin
         if (value === false) {
             data.text.hide();
         } else {
-            data.text = "";
-			data.text
+            data.text
                     .show()
                     .html(value);
         }

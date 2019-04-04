@@ -336,7 +336,7 @@ function invokeNLP(txt){
 			document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].travelDatetime").value = convertDate(json.Onward_Date != null ? json.Onward_Date : json.Return_Date);
 			
 			getAirportCodes(tidyData(json.Source_Airport), tidyData(json.Destination_Airport));
-			$.LoadingOverlay("hide");
+			//uncomment//$.LoadingOverlay("hide");
 			
 		}
 	};
@@ -349,7 +349,7 @@ function invokeNLP(txt){
 	//document.getElementById("dcep-a4c9249ac-c866-49a8-9faa-21e61a35702b-flm-flight-flightQuery.flightSegments[0].originCode").focus();
 
 	setTimeout(function(){
-		$.LoadingOverlay("hide");
+		//uncomment//$.LoadingOverlay("hide");
 	}, 10000);
 	
 }
